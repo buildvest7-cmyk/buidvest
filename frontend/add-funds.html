@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildVest Add Funds</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <nav class="sidebar-nav">
+
+        <a href="./dashboard.html" class="sidebar-link">
+          Dashboard
+        </a>
+
+        <a href="./properties.html" class="sidebar-link">
+          Properties
+        </a>
+
+        <a href="./investments.html" class="sidebar-link">
+          Investments
+        </a>
+
+        <a href="./portfolio.html" class="sidebar-link">
+          Portfolio
+        </a>
+
+        <a href="./transactions.html" class="sidebar-link">
+          Transactions
+        </a>
+
+        <a href="./referrals.html" class="sidebar-link">
+          Referrals
+        </a>
+
+        <a href="./transfers.html" class="sidebar-link">
+          Transfers
+        </a>
+
+        <a href="./profile.html" class="sidebar-link">
+          Profile
+        </a>
+
+        <button
+          id="logoutButton"
+          class="btn btn-danger btn-block"
+          type="button"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ?
+          </button>
+
+          <div class="brand">
+            BuildVest
+          </div>
+
+          <div class="header-actions">
+            <span class="badge badge-success">
+              Active
+            </span>
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+
+              <h1 class="page-title">
+                Add Funds
+              </h1>
+
+              <p class="page-subtitle">
+                Manually fund your BuildVest wallet.
+              </p>
+
+            </div>
+
+          </div>
+
+          <section class="card">
+
+            <div class="card-header">
+
+              <div>
+
+                <h2 class="card-title">
+                  Manual Funding
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Send the required amount manually using the payment
+                  instructions provided by BuildVest, then submit your
+                  funding request for confirmation.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div class="card-body">
+
+              <div class="card">
+
+                <div class="card-body">
+
+                  <h3 class="card-title">
+                    Payment Instructions
+                  </h3>
+
+                  <p class="text-muted mt-2">
+                    BuildVest payment details will be provided here.
+                  </p>
+
+                  <p class="text-muted mt-2">
+                    After making your manual payment, submit the amount
+                    and payment reference below.
+                  </p>
+
+                </div>
+
+              </div>
+
+              <form id="addFundsForm" class="mt-6">
+
+                <div class="form-group">
+
+                  <label for="fundAmount">
+                    Amount (KES)
+                  </label>
+
+                  <input
+                    id="fundAmount"
+                    type="number"
+                    class="form-control"
+                    min="1"
+                    step="0.01"
+                    placeholder="Enter amount"
+                    required
+                  >
+
+                </div>
+
+                <div class="form-group mt-4">
+
+                  <label for="paymentReference">
+                    Payment Reference
+                  </label>
+
+                  <input
+                    id="paymentReference"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter your payment reference"
+                    required
+                  >
+
+                </div>
+
+                <div
+                  id="addFundsMessage"
+                  class="message mt-4"
+                ></div>
+
+                <button
+                  type="submit"
+                  id="addFundsButton"
+                  class="btn btn-primary"
+                >
+                  Submit Funding Request
+                </button>
+
+              </form>
+
+            </div>
+
+          </section>
+
+           <section class="card mt-6">
+
+            <div class="card-header">
+
+              <div>
+
+                <h2 class="card-title">
+                  My Funding Requests
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Track the status of your manual funding requests.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="fundingRequestsContainer"
+                class="transaction-list"
+              >
+
+                <div class="loading">
+                  Loading funding requests...
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+           
+
+  <script src="./js/main.js"></script>
+
+  <script>
+
+      async function loadFundingRequests() {
+
+    const container =
+      document.getElementById(
+        "fundingRequestsContainer"
+      );
+
+    if (!container) {
+      return;
+    }
+
+    try {
+
+      const data =
+        await apiRequest(
+          "/funding/my"
+        );
+
+      const requests =
+        data.requests || [];
+
+      if (requests.length === 0) {
+
+        container.innerHTML = `
+          <div class="empty-state">
+            No funding requests yet.
+          </div>
+        `;
+
+        return;
+      }
+
+      container.innerHTML =
+        requests.map(
+          (request) => {
+
+            let statusClass =
+              "badge-warning";
+
+            if (
+              request.status === "APPROVED"
+            ) {
+              statusClass =
+                "badge-success";
+            }
+
+            if (
+              request.status === "REJECTED"
+            ) {
+              statusClass =
+                "badge-danger";
+            }
+
+            return `
+              <div class="transaction-item">
+
+                <div class="transaction-main">
+
+                  <p class="transaction-title">
+                    Manual Funding
+                  </p>
+
+                  <div class="transaction-reference">
+                    Amount:
+                    ${formatKES(request.amount)}
+                  </div>
+
+                  <div class="transaction-reference">
+                    Reference:
+                    ${request.payment_reference}
+                  </div>
+
+                  <div class="transaction-reference">
+                    ${new Date(
+                      request.created_at
+                    ).toLocaleString("en-KE")}
+                  </div>
+
+                  ${
+                    request.admin_note
+                      ? `
+                        <div class="transaction-reference">
+                          Note:
+                          ${request.admin_note}
+                        </div>
+                      `
+                      : ""
+                  }
+
+                </div>
+
+                <div>
+                  <span class="badge ${statusClass}">
+                    ${request.status}
+                  </span>
+                </div>
+
+              </div>
+            `;
+          }
+        ).join("");
+
+    } catch (error) {
+
+      container.innerHTML = `
+        <div class="error-state">
+          ${error.message}
+        </div>
+      `;
+
+    }
+  }
+
+  const addFundsForm =
+    document.getElementById("addFundsForm");
+
+  addFundsForm.addEventListener(
+    "submit",
+    async (event) => {
+      event.preventDefault();
+
+      const amount =
+        Number(
+          document.getElementById(
+            "fundAmount"
+          ).value
+        );
+
+      const paymentReference =
+        document
+          .getElementById(
+            "paymentReference"
+          )
+          .value.trim();
+
+      const message =
+        document.getElementById(
+          "addFundsMessage"
+        );
+
+      const button =
+        document.getElementById(
+          "addFundsButton"
+        );
+
+      message.textContent =
+        "Submitting funding request...";
+
+      message.className =
+        "message";
+
+      button.disabled = true;
+
+      try {
+        const data =
+          await apiRequest(
+            "/funding",
+            {
+              method: "POST",
+              body: JSON.stringify({
+                amount,
+                payment_reference:
+                  paymentReference,
+              }),
+            }
+          );
+
+        message.textContent =
+          data.message ||
+          "Funding request submitted successfully.";
+
+        message.className =
+          "message success";
+
+        addFundsForm.reset();
+
+        await loadFundingRequests();
+      } catch (error) {
+        message.textContent =
+          error.message;
+
+        message.className =
+          "message error";
+      } finally {
+        button.disabled = false;
+      }
+    }
+  );
+
+    loadFundingRequests();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>BuildVest | Properties</title>
+
+  <link
+    rel="stylesheet"
+    href="./css/styles.css"
+  >
+</head>
+
+<body>
+
+  <div class="dashboard-layout admin-layout">
+
+    <aside
+      class="sidebar"
+      id="adminSidebar"
+    >
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <div class="admin-badge">
+        Administration
+      </div>
+
+      <nav class="sidebar-nav mt-5">
+
+        <a
+          href="./admin.html"
+          class="sidebar-link"
+        >
+          Dashboard
+        </a>
+
+        <a
+          href="./admin-users.html"
+          class="sidebar-link"
+        >
+          Users
+        </a>
+
+        <a
+          href="./admin-properties.html"
+          class="sidebar-link active"
+        >
+          Properties
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Investments
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Transactions
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Referrals
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Transfers
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Wallets
+        </a>
+
+        <button
+          id="adminLogoutButton"
+          type="button"
+          class="btn btn-danger btn-block mt-5"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="adminMobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest Admin
+          </div>
+
+          <div class="header-actions">
+
+            <span class="admin-badge">
+              ADMIN
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+
+              <span class="login-eyebrow">
+                ADMINISTRATION
+              </span>
+
+              <h1 class="page-title">
+                Properties
+              </h1>
+
+              <p class="page-subtitle">
+                Manage BuildVest investment properties.
+              </p>
+
+            </div>
+
+          </div>
+
+          <section class="card">
+
+            <div class="card-header">
+
+              <div>
+
+                <h2 class="card-title">
+                  All Properties
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Review property inventory and availability.
+                </p>
+
+              </div>
+
+              <span
+                id="propertyCountBadge"
+                class="badge badge-success"
+              >
+                0 Properties
+              </span>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="adminPropertiesContainer"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading properties...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+
+    function setupAdminPropertiesPage() {
+
+      const token =
+        getAdminToken();
+
+      if (!token) {
+
+        window.location.href =
+          "./admin-login.html";
+
+        return;
+
+      }
+
+      const logoutButton =
+        document.getElementById(
+          "adminLogoutButton"
+        );
+
+      logoutButton?.addEventListener(
+        "click",
+        () => {
+
+          localStorage.removeItem(
+            "buildvest_admin_token"
+          );
+
+          window.location.href =
+            "./admin-login.html";
+
+        }
+      );
+
+      const mobileButton =
+        document.getElementById(
+          "adminMobileMenuButton"
+        );
+
+      const sidebar =
+        document.getElementById(
+          "adminSidebar"
+        );
+
+      mobileButton?.addEventListener(
+        "click",
+        () => {
+
+          sidebar?.classList.toggle(
+            "open"
+          );
+
+        }
+      );
+
+    }
+
+    async function loadAdminProperties() {
+
+      const container =
+        document.getElementById(
+          "adminPropertiesContainer"
+        );
+
+      const countBadge =
+        document.getElementById(
+          "propertyCountBadge"
+        );
+
+      try {
+
+        const data =
+          await adminApiRequest(
+            "/properties/admin/all"
+          );
+
+        const properties =
+          data.properties || [];
+
+        countBadge.textContent =
+          `${properties.length} ${
+            properties.length === 1
+              ? "Property"
+              : "Properties"
+          }`;
+
+        if (properties.length === 0) {
+
+          container.innerHTML = `
+            <div class="empty-state">
+              No properties found.
+            </div>
+          `;
+
+          return;
+
+        }
+
+        container.innerHTML =
+          properties
+            .map((property) => {
+
+              const statusClass =
+                property.status === "ACTIVE"
+                  ? "badge-success"
+                  : "badge-danger";
+
+              const nextStatus =
+                property.status === "ACTIVE"
+                  ? "INACTIVE"
+                  : "ACTIVE";
+
+              const actionText =
+                property.status === "ACTIVE"
+                  ? "Deactivate"
+                  : "Activate";
+
+              return `
+                <div class="transaction-item">
+
+                  <div class="transaction-main">
+
+                    <p class="transaction-title">
+                      ${property.title}
+                    </p>
+
+                    <div class="transaction-reference">
+                      ${property.location}
+                      · ${property.property_type}
+                    </div>
+
+                    <div class="transaction-reference">
+                      Total value:
+                      KES ${Number(
+                        property.total_value || 0
+                      ).toLocaleString("en-KE", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })}
+                    </div>
+
+                    <div class="transaction-reference">
+                      Units:
+                      ${property.available_units}
+                      available /
+                      ${property.total_units}
+                      total
+                    </div>
+
+                    <div class="transaction-reference">
+                      Created:
+                      ${
+                        property.created_at
+                          ? new Date(
+                              property.created_at
+                            ).toLocaleDateString("en-KE")
+                          : "—"
+                      }
+                    </div>
+
+                  </div>
+
+                  <div class="table-actions">
+
+                    <span class="badge ${statusClass}">
+                      ${property.status}
+                    </span>
+
+                    <button
+                      type="button"
+                      class="btn btn-secondary btn-sm"
+                      data-property-status-id="${property.id}"
+                      data-next-status="${nextStatus}"
+                    >
+                      ${actionText}
+                    </button>
+
+                  </div>
+
+                </div>
+              `;
+
+            })
+            .join("");
+
+        container
+          .querySelectorAll(
+            "[data-property-status-id]"
+          )
+          .forEach((button) => {
+
+            button.addEventListener(
+              "click",
+              async () => {
+
+                const propertyId =
+                  button.dataset
+                    .propertyStatusId;
+
+                const nextStatus =
+                  button.dataset
+                    .nextStatus;
+
+                button.disabled = true;
+                button.textContent =
+                  "Updating...";
+
+                try {
+
+                  await adminApiRequest(
+                    `/properties/${propertyId}/status`,
+                    {
+                      method: "PATCH",
+                      body: JSON.stringify({
+                        status:
+                          nextStatus
+                      })
+                    }
+                  );
+
+                  await loadAdminProperties();
+
+                } catch (error) {
+
+                  alert(error.message);
+
+                  button.disabled =
+                    false;
+
+                  button.textContent =
+                    nextStatus === "ACTIVE"
+                      ? "Activate"
+                      : "Deactivate";
+
+                }
+
+              }
+            );
+
+          });
+
+      } catch (error) {
+
+        console.error(
+          "Load admin properties error:",
+          error
+        );
+
+        container.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+
+      }
+
+    }
+
+    setupAdminPropertiesPage();
+    loadAdminProperties();
+
+  </script>
+
+</body>
+</html>

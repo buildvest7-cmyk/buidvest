@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>BuildVest | Admin Funding</title>
+
+  <link
+    rel="stylesheet"
+    href="./css/styles.css"
+  >
+</head>
+
+<body>
+
+  <div class="dashboard-layout admin-layout">
+
+    <aside class="sidebar" id="adminSidebar">
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <div class="admin-badge">
+        Administration
+      </div>
+
+      <nav class="sidebar-nav mt-5">
+
+        <a href="./admin.html" class="sidebar-link">
+          Dashboard
+        </a>
+
+        <a href="./admin-users.html" class="sidebar-link">
+          Users
+        </a>
+
+        <a href="./admin-properties.html" class="sidebar-link">
+          Properties
+        </a>
+
+        <a href="./admin-investments.html" class="sidebar-link">
+          Investments
+        </a>
+
+        <a href="./admin-transactions.html" class="sidebar-link">
+          Transactions
+        </a>
+
+        <a href="./admin-referrals.html" class="sidebar-link">
+          Referrals
+        </a>
+
+        <a href="./admin-transfers.html" class="sidebar-link">
+          Transfers
+        </a>
+
+        <a href="./admin-wallets.html" class="sidebar-link">
+          Wallets
+        </a>
+
+        <a
+          href="./admin-funding.html"
+          class="sidebar-link active"
+        >
+          Funding
+        </a>
+
+        <button
+          id="adminLogoutButton"
+          type="button"
+          class="btn btn-danger btn-block mt-5"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="adminMobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ?
+          </button>
+
+          <div class="brand">
+            BuildVest Admin
+          </div>
+
+          <div class="header-actions">
+            <span class="admin-badge">
+              ADMIN
+            </span>
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+
+              <span class="login-eyebrow">
+                ADMINISTRATION
+              </span>
+
+              <h1 class="page-title">
+                Funding Requests
+              </h1>
+
+              <p class="page-subtitle">
+                Review and process manual wallet funding requests.
+              </p>
+
+            </div>
+
+          </div>
+
+          <section class="stats-grid">
+
+            <div class="stat-card">
+              <div class="stat-label">
+                Pending Requests
+              </div>
+
+              <div
+                id="pendingFundingCount"
+                class="stat-value"
+              >
+                0
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">
+                Approved Requests
+              </div>
+
+              <div
+                id="approvedFundingCount"
+                class="stat-value"
+              >
+                0
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">
+                Rejected Requests
+              </div>
+
+              <div
+                id="rejectedFundingCount"
+                class="stat-value"
+              >
+                0
+              </div>
+            </div>
+
+          </section>
+
+          <section class="card mt-6">
+
+            <div class="card-header">
+
+              <div>
+
+                <h2 class="card-title">
+                  Manual Funding Requests
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Approve a request to credit the user's BuildVest wallet.
+                </p>
+
+              </div>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="fundingRequestsContainer"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading funding requests...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+
+    async function loadFundingRequests() {
+
+      const container =
+        document.getElementById(
+          "fundingRequestsContainer"
+        );
+
+      try {
+
+        const data =
+          await adminApiRequest(
+            "/funding/admin/all"
+          );
+
+        const requests =
+          data.requests || [];
+
+        const pending =
+          requests.filter(
+            (request) =>
+              request.status === "PENDING"
+          ).length;
+
+        const approved =
+          requests.filter(
+            (request) =>
+              request.status === "APPROVED"
+          ).length;
+
+        const rejected =
+          requests.filter(
+            (request) =>
+              request.status === "REJECTED"
+          ).length;
+
+        document.getElementById(
+          "pendingFundingCount"
+        ).textContent = pending;
+
+        document.getElementById(
+          "approvedFundingCount"
+        ).textContent = approved;
+
+        document.getElementById(
+          "rejectedFundingCount"
+        ).textContent = rejected;
+
+        if (requests.length === 0) {
+
+          container.innerHTML = `
+            <div class="empty-state">
+              No funding requests found.
+            </div>
+          `;
+
+          return;
+        }
+
+        container.innerHTML =
+          requests.map(
+            (request) => {
+
+              let statusClass =
+                "badge-warning";
+
+              if (
+                request.status ===
+                "APPROVED"
+              ) {
+                statusClass =
+                  "badge-success";
+              }
+
+              if (
+                request.status ===
+                "REJECTED"
+              ) {
+                statusClass =
+                  "badge-danger";
+              }
+
+              return `
+                <div class="transaction-item">
+
+                  <div class="transaction-main">
+
+                    <p class="transaction-title">
+                      ${request.full_name}
+                    </p>
+
+                    <div class="transaction-reference">
+                      ${request.email}
+                    </div>
+
+                    <div class="transaction-reference">
+                      Amount:
+                      ${formatKES(request.amount)}
+                    </div>
+
+                    <div class="transaction-reference">
+                      Payment Reference:
+                      ${request.payment_reference}
+                    </div>
+
+                    <div class="transaction-reference">
+                      ${new Date(
+                        request.created_at
+                      ).toLocaleString("en-KE")}
+                    </div>
+
+                  </div>
+
+                  <div>
+
+                    <div class="transaction-amount">
+                      ${formatKES(request.amount)}
+                    </div>
+
+                    <span class="badge ${statusClass}">
+                      ${request.status}
+                    </span>
+
+                    ${
+                      request.status ===
+                      "PENDING"
+                        ? `
+                          <div class="table-actions mt-3">
+
+                            <button
+                              type="button"
+                              class="btn btn-success btn-sm"
+                              data-approve="${request.id}"
+                            >
+                              Approve
+                            </button>
+
+                            <button
+                              type="button"
+                              class="btn btn-danger btn-sm"
+                              data-reject="${request.id}"
+                            >
+                              Reject
+                            </button>
+
+                          </div>
+                        `
+                        : ""
+                    }
+
+                  </div>
+
+                </div>
+              `;
+            }
+          ).join("");
+
+      } catch (error) {
+
+        container.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+
+      }
+
+    }
+
+    document.addEventListener(
+      "click",
+      async (event) => {
+
+        const approveButton =
+          event.target.closest(
+            "[data-approve]"
+          );
+
+        const rejectButton =
+          event.target.closest(
+            "[data-reject]"
+          );
+
+        if (
+          !approveButton &&
+          !rejectButton
+        ) {
+          return;
+        }
+
+        const requestId =
+          approveButton
+            ? approveButton.dataset.approve
+            : rejectButton.dataset.reject;
+
+        try {
+
+          if (approveButton) {
+
+            const confirmed =
+              window.confirm(
+                "Approve this funding request and credit the user's wallet?"
+              );
+
+            if (!confirmed) {
+              return;
+            }
+
+            await adminApiRequest(
+              `/funding/admin/${requestId}/approve`,
+              {
+                method: "PATCH",
+              }
+            );
+
+          } else {
+
+            const adminNote =
+              window.prompt(
+                "Reason for rejection (optional):"
+              );
+
+            await adminApiRequest(
+              `/funding/admin/${requestId}/reject`,
+              {
+                method: "PATCH",
+                body: JSON.stringify({
+                  admin_note:
+                    adminNote || null,
+                }),
+              }
+            );
+
+          }
+
+          await loadFundingRequests();
+
+        } catch (error) {
+
+          window.alert(error.message);
+
+        }
+
+      }
+    );
+
+    const adminLogoutButton =
+      document.getElementById(
+        "adminLogoutButton"
+      );
+
+    if (adminLogoutButton) {
+
+      adminLogoutButton.addEventListener(
+        "click",
+        () => {
+
+          localStorage.removeItem(
+            "buildvest_admin_token"
+          );
+
+          window.location.href =
+            "./admin-login.html";
+
+        }
+      );
+
+    }
+
+    const adminMobileMenuButton =
+      document.getElementById(
+        "adminMobileMenuButton"
+      );
+
+    const adminSidebar =
+      document.getElementById(
+        "adminSidebar"
+      );
+
+    if (
+      adminMobileMenuButton &&
+      adminSidebar
+    ) {
+
+      adminMobileMenuButton.addEventListener(
+        "click",
+        () => {
+
+          adminSidebar.classList.toggle(
+            "open"
+          );
+
+        }
+      );
+
+    }
+
+    if (!getAdminToken()) {
+
+      window.location.href =
+        "./admin-login.html";
+
+    } else {
+
+      loadFundingRequests();
+
+    }
+
+  </script>
+
+</body>
+</html>

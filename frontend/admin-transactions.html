@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>BuildVest | Transactions</title>
+
+  <link
+    rel="stylesheet"
+    href="./css/styles.css"
+  >
+</head>
+
+<body>
+
+  <div class="dashboard-layout admin-layout">
+
+    <aside
+      class="sidebar"
+      id="adminSidebar"
+    >
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <div class="admin-badge">
+        Administration
+      </div>
+
+      <nav class="sidebar-nav mt-5">
+
+        <a
+          href="./admin.html"
+          class="sidebar-link"
+        >
+          Dashboard
+        </a>
+
+        <a
+          href="./admin-users.html"
+          class="sidebar-link"
+        >
+          Users
+        </a>
+
+        <a
+          href="./admin-properties.html"
+          class="sidebar-link"
+        >
+          Properties
+        </a>
+
+        <a
+          href="./admin-investments.html"
+          class="sidebar-link"
+        >
+          Investments
+        </a>
+
+        <a
+          href="./admin-transactions.html"
+          class="sidebar-link active"
+        >
+          Transactions
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Referrals
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Transfers
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Wallets
+        </a>
+
+        <button
+          id="adminLogoutButton"
+          type="button"
+          class="btn btn-danger btn-block mt-5"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="adminMobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest Admin
+          </div>
+
+          <div class="header-actions">
+
+            <span class="admin-badge">
+              ADMIN
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+
+              <span class="login-eyebrow">
+                ADMINISTRATION
+              </span>
+
+              <h1 class="page-title">
+                Transactions
+              </h1>
+
+              <p class="page-subtitle">
+                Review BuildVest investment payment transactions.
+              </p>
+
+            </div>
+
+          </div>
+
+          <section class="card">
+
+            <div class="card-header">
+
+              <div>
+
+                <h2 class="card-title">
+                  All Transactions
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Monitor payment status, customer and investment details.
+                </p>
+
+              </div>
+
+              <span
+                id="transactionCountBadge"
+                class="badge badge-success"
+              >
+                0 Transactions
+              </span>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="adminTransactionsContainer"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading transactions...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+
+    function setupAdminTransactionsPage() {
+
+      const token =
+        getAdminToken();
+
+      if (!token) {
+
+        window.location.href =
+          "./admin-login.html";
+
+        return;
+
+      }
+
+      const logoutButton =
+        document.getElementById(
+          "adminLogoutButton"
+        );
+
+      logoutButton?.addEventListener(
+        "click",
+        () => {
+
+          localStorage.removeItem(
+            "buildvest_admin_token"
+          );
+
+          window.location.href =
+            "./admin-login.html";
+
+        }
+      );
+
+      const mobileButton =
+        document.getElementById(
+          "adminMobileMenuButton"
+        );
+
+      const sidebar =
+        document.getElementById(
+          "adminSidebar"
+        );
+
+      mobileButton?.addEventListener(
+        "click",
+        () => {
+
+          sidebar?.classList.toggle(
+            "open"
+          );
+
+        }
+      );
+
+    }
+
+    function transactionStatusClass(
+      status
+    ) {
+
+      if (status === "SUCCESS") {
+        return "badge-success";
+      }
+
+      if (status === "FAILED") {
+        return "badge-danger";
+      }
+
+      return "badge-warning";
+
+    }
+
+    async function loadAdminTransactions() {
+
+      const container =
+        document.getElementById(
+          "adminTransactionsContainer"
+        );
+
+      const countBadge =
+        document.getElementById(
+          "transactionCountBadge"
+        );
+
+      try {
+
+        const data =
+          await adminApiRequest(
+            "/transactions/admin/all"
+          );
+
+        const transactions =
+          data.transactions || [];
+
+        countBadge.textContent =
+          `${transactions.length} ${
+            transactions.length === 1
+              ? "Transaction"
+              : "Transactions"
+          }`;
+
+        if (
+          transactions.length === 0
+        ) {
+
+          container.innerHTML = `
+            <div class="empty-state">
+              No transactions found.
+            </div>
+          `;
+
+          return;
+
+        }
+
+        container.innerHTML =
+          transactions
+            .map((transaction) => {
+
+              return `
+                <div class="transaction-item">
+
+                  <div class="transaction-main">
+
+                    <p class="transaction-title">
+                      ${transaction.property_title || "Investment Payment"}
+                    </p>
+
+                    <div class="transaction-reference">
+                      Customer:
+                      ${transaction.customer_name || "—"}
+                    </div>
+
+                    <div class="transaction-reference">
+                      ${transaction.customer_email || "—"}
+                    </div>
+
+                    <div class="transaction-reference">
+                      Type:
+                      ${
+                        transaction.transaction_type
+                          ? transaction.transaction_type.replaceAll("_", " ")
+                          : "—"
+                      }
+                    </div>
+
+                    <div class="transaction-reference">
+                      Reference:
+                      ${transaction.reference || "—"}
+                    </div>
+
+                    <div class="transaction-reference">
+                      ${
+                        transaction.created_at
+                          ? new Date(
+                              transaction.created_at
+                            ).toLocaleString("en-KE")
+                          : "—"
+                      }
+                    </div>
+
+                  </div>
+
+                  <div class="table-actions">
+
+                    <div class="transaction-amount">
+                      ${formatKES(transaction.amount)}
+                    </div>
+
+                    <span class="badge ${
+                      transactionStatusClass(
+                        transaction.status
+                      )
+                    }">
+                      ${transaction.status}
+                    </span>
+
+                  </div>
+
+                </div>
+              `;
+
+            })
+            .join("");
+
+      } catch (error) {
+
+        console.error(
+          "Load admin transactions error:",
+          error
+        );
+
+        container.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+
+      }
+
+    }
+
+    setupAdminTransactionsPage();
+    loadAdminTransactions();
+
+  </script>
+
+</body>
+</html>

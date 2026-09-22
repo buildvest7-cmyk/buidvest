@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildVest Investments</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-brand">BuildVest</div>
+
+      <nav class="sidebar-nav">
+
+        <a href="./dashboard.html" class="sidebar-link">
+          Dashboard
+        </a>
+
+        <a href="./properties.html" class="sidebar-link">
+          Properties
+        </a>
+
+        <a href="./investments.html" class="sidebar-link active">
+          Investments
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Portfolio
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Transactions
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Referrals
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Transfers
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Profile
+        </a>
+
+        <button
+          id="logoutButton"
+          class="btn btn-danger btn-block"
+          type="button"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest
+          </div>
+
+          <div class="header-actions">
+            <span class="badge badge-success">
+              Active
+            </span>
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+              <h1 class="page-title">
+                Investments
+              </h1>
+
+              <p class="page-subtitle">
+                View and manage your BuildVest investments.
+              </p>
+            </div>
+
+          </div>
+
+          <section class="card">
+
+            <div class="card-header">
+
+              <div>
+                <h2 class="card-title">
+                  My Investments
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Your approved, pending and rejected investment requests.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="investmentsContainer"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading investments...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+    async function loadInvestmentsPage() {
+
+      const token =
+        localStorage.getItem("buildvest_token");
+
+      const container =
+        document.getElementById(
+          "investmentsContainer"
+        );
+
+      if (!token) {
+        window.location.href = "./index.html";
+        return;
+      }
+
+      try {
+
+        const response = await fetch(
+          "/api/investments/my",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            "Failed to load investments"
+          );
+        }
+
+        if (
+          !data.investments ||
+          data.investments.length === 0
+        ) {
+
+          container.innerHTML = `
+            <div class="empty-state">
+              You do not have any investments yet.
+            </div>
+          `;
+
+          return;
+        }
+
+        container.innerHTML =
+          data.investments
+            .map((investment) => {
+
+              let statusClass =
+                "badge-warning";
+
+              if (
+                investment.status === "APPROVED"
+              ) {
+                statusClass =
+                  "badge-success";
+              }
+
+              if (
+                investment.status === "REJECTED"
+              ) {
+                statusClass =
+                  "badge-danger";
+              }
+
+              return `
+                <div class="transaction-item">
+
+                  <div class="transaction-main">
+
+                    <p class="transaction-title">
+                      ${investment.property_title}
+                    </p>
+
+                    <div class="transaction-reference">
+                      ${investment.location}
+                      · ${investment.units} units
+                    </div>
+
+                    <div class="transaction-reference">
+                      ${investment.created_at
+                        ? new Date(
+                            investment.created_at
+                          ).toLocaleDateString("en-KE")
+                        : ""}
+                    </div>
+
+                  </div>
+
+                  <div>
+
+                    <div class="transaction-amount">
+                      KES ${Number(
+                        investment.amount || 0
+                      ).toLocaleString("en-KE", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })}
+                    </div>
+
+                    <span class="badge ${statusClass}">
+                      ${investment.status}
+                    </span>
+
+                  </div>
+
+                </div>
+              `;
+
+            })
+            .join("");
+
+      } catch (error) {
+
+        console.error(
+          "Load investments page error:",
+          error
+        );
+
+        container.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+      }
+
+    }
+
+    loadInvestmentsPage();
+  </script>
+
+</body>
+</html>

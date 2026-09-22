@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>BuildVest | Referrals</title>
+
+  <link
+    rel="stylesheet"
+    href="./css/styles.css"
+  >
+</head>
+
+<body>
+
+  <div class="dashboard-layout admin-layout">
+
+    <aside
+      class="sidebar"
+      id="adminSidebar"
+    >
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <div class="admin-badge">
+        Administration
+      </div>
+
+      <nav class="sidebar-nav mt-5">
+
+        <a
+          href="./admin.html"
+          class="sidebar-link"
+        >
+          Dashboard
+        </a>
+
+        <a
+          href="./admin-users.html"
+          class="sidebar-link"
+        >
+          Users
+        </a>
+
+        <a
+          href="./admin-properties.html"
+          class="sidebar-link"
+        >
+          Properties
+        </a>
+
+        <a
+          href="./admin-investments.html"
+          class="sidebar-link"
+        >
+          Investments
+        </a>
+
+        <a
+          href="./admin-transactions.html"
+          class="sidebar-link"
+        >
+          Transactions
+        </a>
+
+        <a
+          href="./admin-referrals.html"
+          class="sidebar-link active"
+        >
+          Referrals
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Transfers
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Wallets
+        </a>
+
+        <button
+          id="adminLogoutButton"
+          type="button"
+          class="btn btn-danger btn-block mt-5"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="adminMobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest Admin
+          </div>
+
+          <div class="header-actions">
+
+            <span class="admin-badge">
+              ADMIN
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+
+              <span class="login-eyebrow">
+                ADMINISTRATION
+              </span>
+
+              <h1 class="page-title">
+                Referrals
+              </h1>
+
+              <p class="page-subtitle">
+                Review referral activity and reward status.
+              </p>
+
+            </div>
+
+          </div>
+
+          <section class="card">
+
+            <div class="card-header">
+
+              <div>
+
+                <h2 class="card-title">
+                  All Referrals
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Review referrers, referred users and referral status.
+                </p>
+
+              </div>
+
+              <span
+                id="referralCountBadge"
+                class="badge badge-success"
+              >
+                0 Referrals
+              </span>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="adminReferralsContainer"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading referrals...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+
+    function setupAdminReferralsPage() {
+
+      const token =
+        getAdminToken();
+
+      if (!token) {
+
+        window.location.href =
+          "./admin-login.html";
+
+        return;
+
+      }
+
+      const logoutButton =
+        document.getElementById(
+          "adminLogoutButton"
+        );
+
+      logoutButton?.addEventListener(
+        "click",
+        () => {
+
+          localStorage.removeItem(
+            "buildvest_admin_token"
+          );
+
+          window.location.href =
+            "./admin-login.html";
+
+        }
+      );
+
+      const mobileButton =
+        document.getElementById(
+          "adminMobileMenuButton"
+        );
+
+      const sidebar =
+        document.getElementById(
+          "adminSidebar"
+        );
+
+      mobileButton?.addEventListener(
+        "click",
+        () => {
+
+          sidebar?.classList.toggle(
+            "open"
+          );
+
+        }
+      );
+
+    }
+
+    function referralStatusClass(status) {
+
+      if (status === "REWARDED") {
+        return "badge-success";
+      }
+
+      if (status === "QUALIFIED") {
+        return "badge-success";
+      }
+
+      if (status === "REJECTED") {
+        return "badge-danger";
+      }
+
+      return "badge-warning";
+    }
+
+    async function loadAdminReferrals() {
+
+      const container =
+        document.getElementById(
+          "adminReferralsContainer"
+        );
+
+      const countBadge =
+        document.getElementById(
+          "referralCountBadge"
+        );
+
+      try {
+
+        const data =
+          await adminApiRequest(
+            "/referrals/admin/all"
+          );
+
+        const referrals =
+          data.referrals || [];
+
+        countBadge.textContent =
+          `${referrals.length} ${
+            referrals.length === 1
+              ? "Referral"
+              : "Referrals"
+          }`;
+
+        if (
+          referrals.length === 0
+        ) {
+
+          container.innerHTML = `
+            <div class="empty-state">
+              No referrals found.
+            </div>
+          `;
+
+          return;
+
+        }
+
+        container.innerHTML =
+          referrals
+            .map((referral) => {
+
+              return `
+                <div class="transaction-item">
+
+                  <div class="transaction-main">
+
+                    <p class="transaction-title">
+                      ${referral.referrer_name || "—"}
+                    </p>
+
+                    <div class="transaction-reference">
+                      Referrer:
+                      ${referral.referrer_email || "—"}
+                    </div>
+
+                    <div class="transaction-reference">
+                      Referred User:
+                      ${referral.referred_user_name || "—"}
+                    </div>
+
+                    <div class="transaction-reference">
+                      ${referral.referred_user_email || "—"}
+                    </div>
+
+                    <div class="transaction-reference">
+                      Created:
+                      ${
+                        referral.created_at
+                          ? new Date(
+                              referral.created_at
+                            ).toLocaleString("en-KE")
+                          : "—"
+                      }
+                    </div>
+
+                  </div>
+
+                  <div class="table-actions">
+
+                    <span class="badge ${
+                      referralStatusClass(
+                        referral.status
+                      )
+                    }">
+                      ${referral.status}
+                    </span>
+
+                    ${
+                      referral.status === "QUALIFIED"
+                        ? `
+                          <button
+                            type="button"
+                            class="btn btn-success btn-sm"
+                            data-reward-referral="${referral.id}"
+                          >
+                            Mark Rewarded
+                          </button>
+                        `
+                        : ""
+                    }
+
+                  </div>
+
+                </div>
+              `;
+
+            })
+            .join("");
+
+        container
+          .querySelectorAll(
+            "[data-reward-referral]"
+          )
+          .forEach((button) => {
+
+            button.addEventListener(
+              "click",
+              async () => {
+
+                const referralId =
+                  button.dataset
+                    .rewardReferral;
+
+                button.disabled = true;
+                button.textContent =
+                  "Updating...";
+
+                try {
+
+                  await adminApiRequest(
+                    `/referrals/${referralId}/status`,
+                    {
+                      method: "PATCH",
+                      body: JSON.stringify({
+                        status:
+                          "REWARDED"
+                      })
+                    }
+                  );
+
+                  await loadAdminReferrals();
+
+                } catch (error) {
+
+                  alert(error.message);
+
+                  button.disabled =
+                    false;
+
+                  button.textContent =
+                    "Mark Rewarded";
+
+                }
+
+              }
+            );
+
+          });
+
+      } catch (error) {
+
+        console.error(
+          "Load admin referrals error:",
+          error
+        );
+
+        container.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+
+      }
+
+    }
+
+    setupAdminReferralsPage();
+    loadAdminReferrals();
+
+  </script>
+
+</body>
+</html>

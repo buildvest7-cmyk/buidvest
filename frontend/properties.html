@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildVest Properties</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <nav class="sidebar-nav">
+
+        <a href="./dashboard.html" class="sidebar-link">
+          Dashboard
+        </a>
+
+        <a href="./properties.html" class="sidebar-link active">
+          Properties
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Investments
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Portfolio
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Transactions
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Referrals
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Transfers
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Profile
+        </a>
+
+        <button
+          id="logoutButton"
+          class="btn btn-danger btn-block"
+          type="button"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest
+          </div>
+
+          <div class="header-actions">
+            <span class="badge badge-success">
+              Active
+            </span>
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+
+              <h1 class="page-title">
+                Properties
+              </h1>
+
+              <p class="page-subtitle">
+                Explore available BuildVest investment properties.
+              </p>
+
+            </div>
+
+          </div>
+
+          <section class="card">
+
+            <div class="card-body">
+
+              <div
+                id="propertiesContainer"
+                class="property-grid"
+              >
+
+                <div class="loading">
+                  Loading properties...
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+    async function loadPropertiesPage() {
+
+      const container =
+        document.getElementById("propertiesContainer");
+
+      try {
+
+        const response = await fetch(
+          "/api/properties"
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(
+            data.message || "Failed to load properties"
+          );
+        }
+
+        if (!data.properties.length) {
+
+          container.innerHTML = `
+            <div class="empty-state">
+              No investment properties are currently available.
+            </div>
+          `;
+
+          return;
+        }
+
+        container.innerHTML =
+          data.properties.map(property => `
+            <div class="property-card">
+
+              <div class="property-card-body">
+
+                <span class="badge badge-success">
+                  ${property.status}
+                </span>
+
+                <h3 class="property-card-title">
+                  ${property.title}
+                </h3>
+
+                <p class="text-muted">
+                  ${property.location}
+                </p>
+
+                <p class="property-description">
+                  ${property.description}
+                </p>
+
+                <div class="property-meta">
+
+                  <div>
+                    <span>Unit Price</span>
+                    <strong>
+                      KES ${Number(property.unit_price).toLocaleString()}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Available Units</span>
+                    <strong>
+                      ${property.available_units}
+                    </strong>
+                  </div>
+
+                </div>
+
+                <a
+                  href="./property.html?id=${property.id}"
+                  class="btn btn-primary btn-block"
+                >
+                  View Opportunity
+                </a>
+
+              </div>
+
+            </div>
+          `).join("");
+
+      } catch (error) {
+
+        console.error("Load properties page error:", error);
+
+        container.innerHTML = `
+          <div class="empty-state">
+            Failed to load properties.
+          </div>
+        `;
+
+      }
+
+    }
+
+    loadPropertiesPage();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildVest Dashboard</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">BuildVest</div>
+
+      <nav class="sidebar-nav">
+        <a href="./dashboard.html" class="sidebar-link active">
+          Dashboard
+        </a>
+
+       <a href="./properties.html" class="sidebar-link">
+  Properties
+</a>
+
+      <a href="./investments.html" class="sidebar-link">
+  Investments
+</a>
+
+       <a href="./portfolio.html" class="sidebar-link">
+  Portfolio
+</a>
+
+      <a href="./transactions.html" class="sidebar-link">
+  Transactions
+</a>
+
+        <a href="./referrals.html" class="sidebar-link">
+  Referrals
+</a>
+
+       <a href="./transfers.html" class="sidebar-link">
+  Transfers
+</a>
+
+        <a href="./profile.html" class="sidebar-link">
+  Profile
+</a>
+
+        <button id="logoutButton" class="btn btn-danger btn-block">
+          Logout
+        </button>
+      </nav>
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+        <div class="header-inner">
+          <button
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest
+          </div>
+
+          <div class="header-actions">
+            <span class="badge badge-success">
+              Active
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">
+                Dashboard
+              </h1>
+
+              <p id="welcomeMessage" class="page-subtitle">
+  Welcome back.
+</p>
+            </div>
+          </div>
+
+         <section class="stats-grid">
+
+  <div class="stat-card">
+    <div class="stat-label">
+      Wallet Balance
+    </div>
+
+    <div
+      id="walletBalance"
+      class="stat-value"
+    >
+      KES 0.00
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">
+      Total Invested
+    </div>
+
+    <div
+      id="totalInvested"
+      class="stat-value"
+    >
+      KES 0.00
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">
+      Properties
+    </div>
+
+    <div
+      id="propertyCount"
+      class="stat-value"
+    >
+      0
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">
+      Total Referrals
+    </div>
+
+    <div
+      id="totalReferrals"
+      class="stat-value"
+    >
+      0
+    </div>
+  </div>
+
+</section>
+
+          <section class="dashboard-grid">
+
+            <div class="card">
+
+              <div class="card-header">
+                <h2 class="card-title">
+                  Recent Wallet Activity
+                </h2>
+
+                <a
+                  href="#"
+                  class="btn btn-secondary btn-sm"
+                >
+                  View All
+                </a>
+              </div>
+
+              <div class="card-body">
+
+                <div
+                  id="walletTransactions"
+                  class="transaction-list"
+                >
+                  <div class="loading">
+                    Loading transactions...
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div>
+
+              <div class="wallet-card">
+
+                <div class="wallet-label">
+                  Available Balance
+                </div>
+
+                <div
+                  id="walletCardBalance"
+                  class="wallet-balance"
+                >
+                  KES 0.00
+                </div>
+
+                <div class="wallet-currency">
+                  BuildVest Internal Wallet
+                </div>
+
+                <div class="wallet-actions">
+
+               <a
+  href="./transfers.html"
+  class="btn"
+>
+  Send Money
+</a>
+
+                 <a
+  href="./add-funds.html"
+  class="btn"
+>
+  Add Funds
+</a>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+          <section class="card mt-6">
+
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">
+        My Investments
+      </h2>
+
+      <p class="text-muted mt-2">
+        Your latest BuildVest investment activity.
+      </p>
+    </div>
+
+    <a
+      href="#"
+      class="btn btn-secondary btn-sm"
+    >
+      View All
+    </a>
+  </div>
+
+  <div class="card-body">
+
+    <div
+      id="myInvestments"
+      class="transaction-list"
+    >
+      <div class="loading">
+        Loading investments...
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<section class="card mt-6">
+
+  <div class="card-header">
+    <div>
+      <h2 class="card-title">
+        Investment Opportunities
+      </h2>
+
+      <p class="text-muted mt-2">
+        Explore available BuildVest investment properties.
+      </p>
+    </div>
+
+    <a
+      href="#"
+      class="btn btn-secondary btn-sm"
+    >
+      View All
+    </a>
+  </div>
+
+  <div class="card-body">
+
+    <div
+      id="investmentOpportunities"
+      class="property-grid"
+    >
+      <div class="loading">
+        Loading opportunities...
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>BuildVest | Admin Dashboard</title>
+
+  <link
+    rel="stylesheet"
+    href="./css/styles.css"
+  >
+</head>
+
+<body>
+
+  <div class="dashboard-layout admin-layout">
+
+    <aside class="sidebar" id="adminSidebar">
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <div class="admin-badge">
+        Administration
+      </div>
+
+      <nav class="sidebar-nav mt-5">
+
+        <a
+          href="./admin.html"
+          class="sidebar-link active"
+        >
+          Dashboard
+        </a>
+
+        <a
+          href="./admin-users.html"
+          class="sidebar-link"
+        >
+          Users
+        </a>
+
+        <a
+          href="./admin-properties.html"
+          class="sidebar-link"
+        >
+          Properties
+        </a>
+
+        <a
+          href="./admin-investments.html"
+          class="sidebar-link"
+        >
+          Investments
+        </a>
+
+        <a
+          href="./admin-transactions.html"
+          class="sidebar-link"
+        >
+          Transactions
+        </a>
+
+        <a
+          href="./admin-referrals.html"
+          class="sidebar-link"
+        >
+          Referrals
+        </a>
+
+        <a
+          href="./admin-transfers.html"
+          class="sidebar-link"
+        >
+          Transfers
+        </a>
+
+        <a
+          href="./admin-wallets.html"
+          class="sidebar-link"
+        >
+          Wallets
+        </a>
+
+        <a
+          href="./admin-funding.html"
+          class="sidebar-link"
+        >
+          Funding
+        </a>
+
+        <button
+          id="adminLogoutButton"
+          type="button"
+          class="btn btn-danger btn-block mt-5"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="adminMobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest Admin
+          </div>
+
+          <div class="header-actions">
+
+            <span class="admin-badge">
+              ADMIN
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+         <div class="page-header">
+
+  <div>
+
+    <span class="login-eyebrow">
+      ADMINISTRATION
+    </span>
+
+    <h1 class="page-title">
+      Platform Overview
+    </h1>
+
+    <p
+      id="adminWelcomeMessage"
+      class="page-subtitle"
+    >
+      Monitor BuildVest activity and operations.
+    </p>
+
+  </div>
+
+  <div class="page-header-actions">
+
+    <a
+      href="./admin-funding.html"
+      class="btn btn-secondary"
+    >
+      Review Funding
+    </a>
+
+  </div>
+
+</div>
+
+          <section class="stats-grid">
+
+            <div class="stat-card">
+
+              <div class="stat-label">
+                Total Users
+              </div>
+
+              <div
+                id="adminTotalUsers"
+                class="stat-value"
+              >
+                0
+              </div>
+
+            </div>
+
+            <div class="stat-card">
+
+              <div class="stat-label">
+                Active Properties
+              </div>
+
+              <div
+                id="adminActiveProperties"
+                class="stat-value"
+              >
+                0
+              </div>
+
+            </div>
+
+            <div class="stat-card">
+
+              <div class="stat-label">
+                Approved Investments
+              </div>
+
+              <div
+                id="adminApprovedInvestments"
+                class="stat-value"
+              >
+                0
+              </div>
+
+            </div>
+
+            <div class="stat-card">
+
+              <div class="stat-label">
+                Pending Investments
+              </div>
+
+              <div
+                id="adminPendingInvestments"
+                class="stat-value"
+              >
+                0
+              </div>
+
+            </div>
+<div class="stat-card">
+
+  <div class="stat-label">
+    Pending Funding Requests
+  </div>
+
+  <div
+    id="adminPendingFunding"
+    class="stat-value"
+  >
+    0
+  </div>
+
+</div>
+
+          </section>
+
+          <section class="grid grid-2">
+
+            <div class="card">
+
+              <div class="card-header">
+
+                <h2 class="card-title">
+                  Investment Overview
+                </h2>
+
+              </div>
+
+              <div class="card-body">
+
+                <div class="grid grid-2">
+
+                  <div class="stat-card">
+
+                    <div class="stat-label">
+                      Approved Investment Value
+                    </div>
+
+                    <div
+                      id="adminInvestmentValue"
+                      class="stat-value"
+                    >
+                      KES 0.00
+                    </div>
+
+                  </div>
+
+                  <div class="stat-card">
+
+                    <div class="stat-label">
+                      Allocated Units
+                    </div>
+
+                    <div
+                      id="adminAllocatedUnits"
+                      class="stat-value"
+                    >
+                      0
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="card">
+
+              <div class="card-header">
+
+                <h2 class="card-title">
+                  Platform Activity
+                </h2>
+
+              </div>
+
+              <div class="card-body">
+
+                <div class="transaction-list">
+
+                  <div class="transaction-item">
+
+                    <div class="transaction-main">
+
+                      <p class="transaction-title">
+                        Successful Transactions
+                      </p>
+
+                    </div>
+
+                    <div
+                      id="adminSuccessfulTransactions"
+                      class="transaction-amount text-success"
+                    >
+                      0
+                    </div>
+
+                  </div>
+
+                  <div class="transaction-item">
+
+                    <div class="transaction-main">
+
+                      <p class="transaction-title">
+                        Successful Payments
+                      </p>
+
+                    </div>
+
+                    <div
+                      id="adminSuccessfulPayments"
+                      class="transaction-amount"
+                    >
+                      KES 0.00
+                    </div>
+
+                  </div>
+
+                  <div class="transaction-item">
+
+                    <div class="transaction-main">
+
+                      <p class="transaction-title">
+                        Qualified Referrals
+                      </p>
+
+                    </div>
+
+                    <div
+                      id="adminQualifiedReferrals"
+                      class="transaction-amount"
+                    >
+                      0
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+          <section class="card mt-6">
+
+            <div class="card-header">
+
+              <div>
+
+                <h2 class="card-title">
+                  Pending Investment Requests
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Investment requests awaiting administration review.
+                </p>
+
+              </div>
+
+              <span
+                id="pendingInvestmentBadge"
+                class="badge badge-warning"
+              >
+                0 Pending
+              </span>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="adminPendingInvestmentsList"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading pending investments...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+</body>
+</html>

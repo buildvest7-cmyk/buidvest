@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>BuildVest | Users</title>
+
+  <link
+    rel="stylesheet"
+    href="./css/styles.css"
+  >
+</head>
+
+<body>
+
+  <div class="dashboard-layout admin-layout">
+
+    <aside
+      class="sidebar"
+      id="adminSidebar"
+    >
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <div class="admin-badge">
+        Administration
+      </div>
+
+      <nav class="sidebar-nav mt-5">
+
+        <a
+          href="./admin.html"
+          class="sidebar-link"
+        >
+          Dashboard
+        </a>
+
+        <a
+          href="./admin-users.html"
+          class="sidebar-link active"
+        >
+          Users
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Properties
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Investments
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Transactions
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Referrals
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Transfers
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Wallets
+        </a>
+
+        <button
+          id="adminLogoutButton"
+          type="button"
+          class="btn btn-danger btn-block mt-5"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="adminMobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest Admin
+          </div>
+
+          <div class="header-actions">
+
+            <span class="admin-badge">
+              ADMIN
+            </span>
+
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+
+              <span class="login-eyebrow">
+                ADMINISTRATION
+              </span>
+
+              <h1 class="page-title">
+                Users
+              </h1>
+
+              <p class="page-subtitle">
+                Manage BuildVest accounts and verification.
+              </p>
+
+            </div>
+
+          </div>
+
+          <section class="card">
+
+            <div class="card-header">
+
+              <div>
+
+                <h2 class="card-title">
+                  BuildVest Users
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Review account status and verification status.
+                </p>
+
+              </div>
+
+              <span
+                id="userCountBadge"
+                class="badge badge-success"
+              >
+                0 Users
+              </span>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="usersContainer"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading users...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+
+    function setupAdminPage() {
+
+      const token =
+        getAdminToken();
+
+      if (!token) {
+
+        window.location.href =
+          "./admin-login.html";
+
+        return;
+
+      }
+
+      const logoutButton =
+        document.getElementById(
+          "adminLogoutButton"
+        );
+
+      logoutButton?.addEventListener(
+        "click",
+        () => {
+
+          localStorage.removeItem(
+            "buildvest_admin_token"
+          );
+
+          window.location.href =
+            "./admin-login.html";
+
+        }
+      );
+
+      const mobileButton =
+        document.getElementById(
+          "adminMobileMenuButton"
+        );
+
+      const sidebar =
+        document.getElementById(
+          "adminSidebar"
+        );
+
+      mobileButton?.addEventListener(
+        "click",
+        () => {
+
+          sidebar?.classList.toggle(
+            "open"
+          );
+
+        }
+      );
+
+    }
+
+    async function loadAdminUsers() {
+
+      const container =
+        document.getElementById(
+          "usersContainer"
+        );
+
+      const countBadge =
+        document.getElementById(
+          "userCountBadge"
+        );
+
+      try {
+
+        const data =
+          await adminApiRequest(
+            "/admin/users"
+          );
+
+        const users =
+          data.users || [];
+
+        countBadge.textContent =
+          `${users.length} ${
+            users.length === 1
+              ? "User"
+              : "Users"
+          }`;
+
+        if (
+          users.length === 0
+        ) {
+
+          container.innerHTML = `
+            <div class="empty-state">
+              No BuildVest users found.
+            </div>
+          `;
+
+          return;
+
+        }
+
+        container.innerHTML =
+          users
+            .map((user) => {
+
+              const accountBadge =
+                user.buildvest_account_status ===
+                "ACTIVE"
+                  ? "badge-success"
+                  : "badge-danger";
+
+              let verificationBadge =
+                "badge-warning";
+
+              if (
+                user.buildvest_verification_status ===
+                "VERIFIED"
+              ) {
+                verificationBadge =
+                  "badge-success";
+              }
+
+              if (
+                user.buildvest_verification_status ===
+                "REJECTED"
+              ) {
+                verificationBadge =
+                  "badge-danger";
+              }
+
+              const nextAccountStatus =
+                user.buildvest_account_status ===
+                "ACTIVE"
+                  ? "SUSPENDED"
+                  : "ACTIVE";
+
+              const accountActionText =
+                user.buildvest_account_status ===
+                "ACTIVE"
+                  ? "Suspend"
+                  : "Activate";
+
+              return `
+                <div class="transaction-item">
+
+                  <div class="transaction-main">
+
+                    <p class="transaction-title">
+                      ${user.full_name}
+                    </p>
+
+                    <div class="transaction-reference">
+                      ${user.email}
+                    </div>
+
+                    <div class="transaction-reference">
+                      ${user.phone || "No phone provided"}
+                      · ${user.role}
+                    </div>
+
+                    <div class="transaction-reference">
+
+                      Account:
+                      <span class="badge ${accountBadge}">
+                        ${user.buildvest_account_status}
+                      </span>
+
+                      Verification:
+                      <span class="badge ${verificationBadge}">
+                        ${user.buildvest_verification_status}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                  <div class="table-actions">
+
+                    <button
+                      type="button"
+                      class="btn btn-secondary btn-sm"
+                      data-user-status-id="${user.id}"
+                      data-next-status="${nextAccountStatus}"
+                      ${
+                        user.role === "ADMIN"
+                          ? "disabled"
+                          : ""
+                      }
+                    >
+                      ${accountActionText}
+                    </button>
+
+                    ${
+                      user.buildvest_verification_status !==
+                      "VERIFIED"
+                        ? `
+                          <button
+                            type="button"
+                            class="btn btn-success btn-sm"
+                            data-verification-id="${user.id}"
+                          >
+                            Verify
+                          </button>
+                        `
+                        : `
+                          <button
+                            type="button"
+                            class="btn btn-secondary btn-sm"
+                            data-reject-verification-id="${user.id}"
+                          >
+                            Reject
+                          </button>
+                        `
+                    }
+
+                  </div>
+
+                </div>
+              `;
+
+            })
+            .join("");
+
+        container
+          .querySelectorAll(
+            "[data-user-status-id]"
+          )
+          .forEach((button) => {
+
+            button.addEventListener(
+              "click",
+              async () => {
+
+                const userId =
+                  button.dataset
+                    .userStatusId;
+
+                const nextStatus =
+                  button.dataset
+                    .nextStatus;
+
+                button.disabled = true;
+
+                try {
+
+                  await adminApiRequest(
+                    `/admin/users/${userId}/status`,
+                    {
+                      method: "PATCH",
+                      body: JSON.stringify({
+                        account_status:
+                          nextStatus
+                      })
+                    }
+                  );
+
+                  await loadAdminUsers();
+
+                } catch (error) {
+
+                  alert(error.message);
+
+                  button.disabled =
+                    false;
+
+                }
+
+              }
+            );
+
+          });
+
+        container
+          .querySelectorAll(
+            "[data-verification-id]"
+          )
+          .forEach((button) => {
+
+            button.addEventListener(
+              "click",
+              async () => {
+
+                const userId =
+                  button.dataset
+                    .verificationId;
+
+                button.disabled = true;
+                button.textContent =
+                  "Verifying...";
+
+                try {
+
+                  await adminApiRequest(
+                    `/admin/users/${userId}/verification`,
+                    {
+                      method: "PATCH",
+                      body: JSON.stringify({
+                        verification_status:
+                          "VERIFIED"
+                      })
+                    }
+                  );
+
+                  await loadAdminUsers();
+
+                } catch (error) {
+
+                  alert(error.message);
+
+                  button.disabled =
+                    false;
+
+                  button.textContent =
+                    "Verify";
+
+                }
+
+              }
+            );
+
+          });
+
+        container
+          .querySelectorAll(
+            "[data-reject-verification-id]"
+          )
+          .forEach((button) => {
+
+            button.addEventListener(
+              "click",
+              async () => {
+
+                const userId =
+                  button.dataset
+                    .rejectVerificationId;
+
+                button.disabled = true;
+                button.textContent =
+                  "Rejecting...";
+
+                try {
+
+                  await adminApiRequest(
+                    `/admin/users/${userId}/verification`,
+                    {
+                      method: "PATCH",
+                      body: JSON.stringify({
+                        verification_status:
+                          "REJECTED"
+                      })
+                    }
+                  );
+
+                  await loadAdminUsers();
+
+                } catch (error) {
+
+                  alert(error.message);
+
+                  button.disabled =
+                    false;
+
+                  button.textContent =
+                    "Reject";
+
+                }
+
+              }
+            );
+
+          });
+
+      } catch (error) {
+
+        console.error(
+          "Load admin users error:",
+          error
+        );
+
+        container.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+
+      }
+
+    }
+
+    setupAdminPage();
+    loadAdminUsers();
+
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>BuildVest | Transfers</title>
+
+  <link
+    rel="stylesheet"
+    href="./css/styles.css"
+  >
+</head>
+
+<body>
+
+  <div class="dashboard-layout admin-layout">
+
+    <aside
+      class="sidebar"
+      id="adminSidebar"
+    >
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <div class="admin-badge">
+        Administration
+      </div>
+
+      <nav class="sidebar-nav mt-5">
+
+        <a
+          href="./admin.html"
+          class="sidebar-link"
+        >
+          Dashboard
+        </a>
+
+        <a
+          href="./admin-users.html"
+          class="sidebar-link"
+        >
+          Users
+        </a>
+
+        <a
+          href="./admin-properties.html"
+          class="sidebar-link"
+        >
+          Properties
+        </a>
+
+        <a
+          href="./admin-investments.html"
+          class="sidebar-link"
+        >
+          Investments
+        </a>
+
+        <a
+          href="./admin-transactions.html"
+          class="sidebar-link"
+        >
+          Transactions
+        </a>
+
+        <a
+          href="./admin-referrals.html"
+          class="sidebar-link"
+        >
+          Referrals
+        </a>
+
+        <a
+          href="./admin-transfers.html"
+          class="sidebar-link active"
+        >
+          Transfers
+        </a>
+
+        <a
+          href="#"
+          class="sidebar-link"
+        >
+          Wallets
+        </a>
+
+        <button
+          id="adminLogoutButton"
+          type="button"
+          class="btn btn-danger btn-block mt-5"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="adminMobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest Admin
+          </div>
+
+          <div class="header-actions">
+            <span class="admin-badge">
+              ADMIN
+            </span>
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+
+              <span class="login-eyebrow">
+                ADMINISTRATION
+              </span>
+
+              <h1 class="page-title">
+                Transfers
+              </h1>
+
+              <p class="page-subtitle">
+                Review wallet transfers between BuildVest users.
+              </p>
+
+            </div>
+
+          </div>
+
+          <section class="card">
+
+            <div class="card-header">
+
+              <div>
+
+                <h2 class="card-title">
+                  All Transfers
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Monitor sender, recipient, amount and transfer status.
+                </p>
+
+              </div>
+
+              <span
+                id="transferCountBadge"
+                class="badge badge-success"
+              >
+                0 Transfers
+              </span>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="adminTransfersContainer"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading transfers...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+
+    function setupAdminTransfersPage() {
+
+      const token =
+        getAdminToken();
+
+      if (!token) {
+
+        window.location.href =
+          "./admin-login.html";
+
+        return;
+
+      }
+
+      const logoutButton =
+        document.getElementById(
+          "adminLogoutButton"
+        );
+
+      logoutButton?.addEventListener(
+        "click",
+        () => {
+
+          localStorage.removeItem(
+            "buildvest_admin_token"
+          );
+
+          window.location.href =
+            "./admin-login.html";
+
+        }
+      );
+
+      const mobileButton =
+        document.getElementById(
+          "adminMobileMenuButton"
+        );
+
+      const sidebar =
+        document.getElementById(
+          "adminSidebar"
+        );
+
+      mobileButton?.addEventListener(
+        "click",
+        () => {
+
+          sidebar?.classList.toggle(
+            "open"
+          );
+
+        }
+      );
+
+    }
+
+    function transferStatusClass(status) {
+
+      if (status === "SUCCESS") {
+        return "badge-success";
+      }
+
+      if (status === "FAILED") {
+        return "badge-danger";
+      }
+
+      return "badge-warning";
+
+    }
+
+    async function loadAdminTransfers() {
+
+      const container =
+        document.getElementById(
+          "adminTransfersContainer"
+        );
+
+      const countBadge =
+        document.getElementById(
+          "transferCountBadge"
+        );
+
+      try {
+
+        const data =
+          await adminApiRequest(
+            "/transfers/admin/all"
+          );
+
+        const transfers =
+          data.transfers || [];
+
+        countBadge.textContent =
+          `${transfers.length} ${
+            transfers.length === 1
+              ? "Transfer"
+              : "Transfers"
+          }`;
+
+        if (
+          transfers.length === 0
+        ) {
+
+          container.innerHTML = `
+            <div class="empty-state">
+              No transfers found.
+            </div>
+          `;
+
+          return;
+
+        }
+
+        container.innerHTML =
+          transfers
+            .map((transfer) => {
+
+              return `
+                <div class="transaction-item">
+
+                  <div class="transaction-main">
+
+                    <p class="transaction-title">
+                      ${transfer.sender_name}
+                      →
+                      ${transfer.recipient_name}
+                    </p>
+
+                    <div class="transaction-reference">
+                      From:
+                      ${transfer.sender_email}
+                    </div>
+
+                    <div class="transaction-reference">
+                      To:
+                      ${transfer.recipient_email}
+                    </div>
+
+                    <div class="transaction-reference">
+                      Reference:
+                      ${transfer.reference}
+                    </div>
+
+                    <div class="transaction-reference">
+                      ${
+                        transfer.created_at
+                          ? new Date(
+                              transfer.created_at
+                            ).toLocaleString("en-KE")
+                          : "—"
+                      }
+                    </div>
+
+                  </div>
+
+                  <div class="table-actions">
+
+                    <div class="transaction-amount">
+                      ${formatKES(transfer.amount)}
+                    </div>
+
+                    <span class="badge ${
+                      transferStatusClass(
+                        transfer.status
+                      )
+                    }">
+                      ${transfer.status}
+                    </span>
+
+                  </div>
+
+                </div>
+              `;
+
+            })
+            .join("");
+
+      } catch (error) {
+
+        console.error(
+          "Load admin transfers error:",
+          error
+        );
+
+        container.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+
+      }
+
+    }
+
+    setupAdminTransfersPage();
+    loadAdminTransfers();
+
+  </script>
+
+</body>
+</html>

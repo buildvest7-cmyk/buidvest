@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildVest Transactions</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-brand">BuildVest</div>
+
+      <nav class="sidebar-nav">
+
+        <a href="./dashboard.html" class="sidebar-link">
+          Dashboard
+        </a>
+
+        <a href="./properties.html" class="sidebar-link">
+          Properties
+        </a>
+
+        <a href="./investments.html" class="sidebar-link">
+          Investments
+        </a>
+
+        <a href="./portfolio.html" class="sidebar-link">
+          Portfolio
+        </a>
+
+        <a href="./transactions.html" class="sidebar-link active">
+          Transactions
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Referrals
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Transfers
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Profile
+        </a>
+
+        <button
+          id="logoutButton"
+          class="btn btn-danger btn-block"
+          type="button"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest
+          </div>
+
+          <div class="header-actions">
+            <span class="badge badge-success">
+              Active
+            </span>
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+              <h1 class="page-title">
+                Transactions
+              </h1>
+
+              <p class="page-subtitle">
+                View your BuildVest investment payment history.
+              </p>
+            </div>
+
+          </div>
+
+          <section class="card">
+
+            <div class="card-header">
+
+              <div>
+                <h2 class="card-title">
+                  Transaction History
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Your completed and pending investment payments.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="transactionsContainer"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading transactions...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+    async function loadTransactionsPage() {
+
+      const token =
+        localStorage.getItem("buildvest_token");
+
+      const container =
+        document.getElementById(
+          "transactionsContainer"
+        );
+
+      if (!token) {
+        window.location.href = "./index.html";
+        return;
+      }
+
+      try {
+
+        const response = await fetch(
+          "/api/transactions/my",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            "Failed to load transactions"
+          );
+        }
+
+        if (
+          !data.transactions ||
+          data.transactions.length === 0
+        ) {
+
+          container.innerHTML = `
+            <div class="empty-state">
+              You do not have any transactions yet.
+            </div>
+          `;
+
+          return;
+        }
+
+        container.innerHTML =
+          data.transactions
+            .map((transaction) => {
+
+              let statusClass =
+                "badge-warning";
+
+              if (
+                transaction.status === "SUCCESS"
+              ) {
+                statusClass =
+                  "badge-success";
+              }
+
+              if (
+                transaction.status === "FAILED"
+              ) {
+                statusClass =
+                  "badge-danger";
+              }
+
+              return `
+                <div class="transaction-item">
+
+                  <div class="transaction-main">
+
+                    <p class="transaction-title">
+                      ${transaction.property_title || "Investment Payment"}
+                    </p>
+
+                    <div class="transaction-reference">
+                      ${transaction.transaction_type.replaceAll("_", " ")}
+                    </div>
+
+                    <div class="transaction-reference">
+                      Reference: ${transaction.reference}
+                    </div>
+
+                    <div class="transaction-reference">
+                      ${transaction.created_at
+                        ? new Date(
+                            transaction.created_at
+                          ).toLocaleString("en-KE")
+                        : ""}
+                    </div>
+
+                  </div>
+
+                  <div>
+
+                    <div class="transaction-amount">
+                      KES ${Number(
+                        transaction.amount || 0
+                      ).toLocaleString("en-KE", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                      })}
+                    </div>
+
+                    <span class="badge ${statusClass}">
+                      ${transaction.status}
+                    </span>
+
+                  </div>
+
+                </div>
+              `;
+
+            })
+            .join("");
+
+      } catch (error) {
+
+        console.error(
+          "Load transactions page error:",
+          error
+        );
+
+        container.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+      }
+
+    }
+
+    loadTransactionsPage();
+  </script>
+
+</body>
+</html>

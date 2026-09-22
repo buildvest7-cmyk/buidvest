@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildVest Portfolio</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <nav class="sidebar-nav">
+
+        <a href="./dashboard.html" class="sidebar-link">
+          Dashboard
+        </a>
+
+        <a href="./properties.html" class="sidebar-link">
+          Properties
+        </a>
+
+        <a href="./investments.html" class="sidebar-link">
+          Investments
+        </a>
+
+        <a href="./portfolio.html" class="sidebar-link active">
+          Portfolio
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Transactions
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Referrals
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Transfers
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Profile
+        </a>
+
+        <button
+          id="logoutButton"
+          class="btn btn-danger btn-block"
+          type="button"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest
+          </div>
+
+          <div class="header-actions">
+            <span class="badge badge-success">
+              Active
+            </span>
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+              <h1 class="page-title">
+                Portfolio
+              </h1>
+
+              <p class="page-subtitle">
+                Track your BuildVest property ownership and investments.
+              </p>
+            </div>
+
+          </div>
+
+          <section class="stats-grid">
+
+            <div class="stat-card">
+              <div class="stat-label">
+                Properties
+              </div>
+
+              <div
+                id="portfolioPropertyCount"
+                class="stat-value"
+              >
+                0
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">
+                Owned Units
+              </div>
+
+              <div
+                id="portfolioOwnedUnits"
+                class="stat-value"
+              >
+                0
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">
+                Total Invested
+              </div>
+
+              <div
+                id="portfolioTotalInvested"
+                class="stat-value"
+              >
+                KES 0.00
+              </div>
+            </div>
+
+          </section>
+
+          <section class="card mt-6">
+
+            <div class="card-header">
+
+              <div>
+                <h2 class="card-title">
+                  Property Holdings
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Your approved ownership by property.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="portfolioContainer"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading portfolio...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+    async function loadPortfolioPage() {
+
+      const token =
+        localStorage.getItem("buildvest_token");
+
+      if (!token) {
+        window.location.href = "./index.html";
+        return;
+      }
+
+      const portfolioContainer =
+        document.getElementById(
+          "portfolioContainer"
+        );
+
+      try {
+
+        const headers = {
+          Authorization: `Bearer ${token}`
+        };
+
+        const [
+          summaryResponse,
+          portfolioResponse
+        ] = await Promise.all([
+
+          fetch(
+            "/api/portfolio/summary",
+            { headers }
+          ),
+
+          fetch(
+            "/api/portfolio/my",
+            { headers }
+          )
+
+        ]);
+
+        const summaryData =
+          await summaryResponse.json();
+
+        const portfolioData =
+          await portfolioResponse.json();
+
+        if (!summaryResponse.ok) {
+          throw new Error(
+            summaryData.message ||
+            "Failed to load portfolio summary"
+          );
+        }
+
+        if (!portfolioResponse.ok) {
+          throw new Error(
+            portfolioData.message ||
+            "Failed to load portfolio"
+          );
+        }
+
+        const summary =
+          summaryData.summary;
+
+        document.getElementById(
+          "portfolioPropertyCount"
+        ).textContent =
+          summary.property_count;
+
+        document.getElementById(
+          "portfolioOwnedUnits"
+        ).textContent =
+          summary.total_owned_units;
+
+        document.getElementById(
+          "portfolioTotalInvested"
+        ).textContent =
+          `KES ${Number(
+            summary.total_invested || 0
+          ).toLocaleString("en-KE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })}`;
+
+        const portfolio =
+          portfolioData.portfolio;
+
+        if (!portfolio || portfolio.length === 0) {
+
+          portfolioContainer.innerHTML = `
+            <div class="empty-state">
+              You do not have any approved property holdings yet.
+            </div>
+          `;
+
+          return;
+        }
+
+        portfolioContainer.innerHTML =
+          portfolio.map((property) => `
+            <div class="transaction-item">
+
+              <div class="transaction-main">
+
+                <p class="transaction-title">
+                  ${property.property_title}
+                </p>
+
+                <div class="transaction-reference">
+                  ${property.location}
+                  · ${property.property_type}
+                </div>
+
+                <div class="transaction-reference">
+                  ${property.owned_units} owned units
+                  · ${property.investment_count} investment
+                  ${Number(property.investment_count) === 1 ? "" : "s"}
+                </div>
+
+              </div>
+
+              <div>
+
+                <div class="transaction-amount">
+                  KES ${Number(
+                    property.total_invested || 0
+                  ).toLocaleString("en-KE", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                  })}
+                </div>
+
+                <span class="badge badge-success">
+                  APPROVED
+                </span>
+
+              </div>
+
+            </div>
+          `).join("");
+
+      } catch (error) {
+
+        console.error(
+          "Load portfolio page error:",
+          error
+        );
+
+        portfolioContainer.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+      }
+
+    }
+
+    loadPortfolioPage();
+  </script>
+
+</body>
+</html>

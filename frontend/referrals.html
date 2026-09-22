@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildVest Referrals</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-brand">BuildVest</div>
+
+      <nav class="sidebar-nav">
+
+        <a href="./dashboard.html" class="sidebar-link">
+          Dashboard
+        </a>
+
+        <a href="./properties.html" class="sidebar-link">
+          Properties
+        </a>
+
+        <a href="./investments.html" class="sidebar-link">
+          Investments
+        </a>
+
+        <a href="./portfolio.html" class="sidebar-link">
+          Portfolio
+        </a>
+
+        <a href="./transactions.html" class="sidebar-link">
+          Transactions
+        </a>
+
+        <a href="./referrals.html" class="sidebar-link active">
+          Referrals
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Transfers
+        </a>
+
+        <a href="#" class="sidebar-link">
+          Profile
+        </a>
+
+        <button
+          id="logoutButton"
+          class="btn btn-danger btn-block"
+          type="button"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest
+          </div>
+
+          <div class="header-actions">
+            <span class="badge badge-success">
+              Active
+            </span>
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+              <h1 class="page-title">
+                Referrals
+              </h1>
+
+              <p class="page-subtitle">
+                Track the people you have referred to BuildVest.
+              </p>
+            </div>
+
+          </div>
+
+          <section class="stats-grid">
+
+            <div class="stat-card">
+              <div class="stat-label">
+                Total Referrals
+              </div>
+
+              <div
+                id="referralTotal"
+                class="stat-value"
+              >
+                0
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">
+                Qualified
+              </div>
+
+              <div
+                id="referralQualified"
+                class="stat-value"
+              >
+                0
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-label">
+                Rewarded
+              </div>
+
+              <div
+                id="referralRewarded"
+                class="stat-value"
+              >
+                0
+              </div>
+            </div>
+
+          </section>
+
+          <section class="card mt-6">
+
+            <div class="card-header">
+
+              <div>
+                <h2 class="card-title">
+                  My Referrals
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Referral activity associated with your account.
+                </p>
+              </div>
+
+            </div>
+
+            <div class="card-body">
+
+              <div
+                id="referralsContainer"
+                class="transaction-list"
+              >
+                <div class="loading">
+                  Loading referrals...
+                </div>
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+    async function loadReferralsPage() {
+
+      const token =
+        localStorage.getItem("buildvest_token");
+
+      const container =
+        document.getElementById(
+          "referralsContainer"
+        );
+
+      if (!token) {
+        window.location.href = "./index.html";
+        return;
+      }
+
+      try {
+
+        const response = await fetch(
+          "/api/referrals/my",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            "Failed to load referrals"
+          );
+        }
+
+        const referrals =
+          data.referrals || [];
+
+        const total =
+          referrals.length;
+
+        const qualified =
+          referrals.filter(
+            (referral) =>
+              referral.status === "QUALIFIED"
+          ).length;
+
+        const rewarded =
+          referrals.filter(
+            (referral) =>
+              referral.status === "REWARDED"
+          ).length;
+
+        document.getElementById(
+          "referralTotal"
+        ).textContent = total;
+
+        document.getElementById(
+          "referralQualified"
+        ).textContent = qualified;
+
+        document.getElementById(
+          "referralRewarded"
+        ).textContent = rewarded;
+
+        if (referrals.length === 0) {
+
+          container.innerHTML = `
+            <div class="empty-state">
+              You do not have any referrals yet.
+            </div>
+          `;
+
+          return;
+        }
+
+        container.innerHTML =
+          referrals.map((referral) => {
+
+            let statusClass =
+              "badge-warning";
+
+            if (
+              referral.status === "QUALIFIED"
+            ) {
+              statusClass =
+                "badge-success";
+            }
+
+            if (
+              referral.status === "REWARDED"
+            ) {
+              statusClass =
+                "badge-success";
+            }
+
+            return `
+              <div class="transaction-item">
+
+                <div class="transaction-main">
+
+                  <p class="transaction-title">
+                    ${referral.referred_user_name}
+                  </p>
+
+                  <div class="transaction-reference">
+                    ${referral.referred_user_email}
+                  </div>
+
+                  <div class="transaction-reference">
+                    Referred on
+                    ${referral.created_at
+                      ? new Date(
+                          referral.created_at
+                        ).toLocaleDateString("en-KE")
+                      : "—"}
+                  </div>
+
+                </div>
+
+                <div>
+                  <span class="badge ${statusClass}">
+                    ${referral.status}
+                  </span>
+                </div>
+
+              </div>
+            `;
+
+          }).join("");
+
+      } catch (error) {
+
+        console.error(
+          "Load referrals page error:",
+          error
+        );
+
+        container.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+      }
+
+    }
+
+    loadReferralsPage();
+  </script>
+
+</body>
+</html>

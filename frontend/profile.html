@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuildVest Profile</title>
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+
+      <div class="sidebar-brand">
+        BuildVest
+      </div>
+
+      <nav class="sidebar-nav">
+
+        <a href="./dashboard.html" class="sidebar-link">
+          Dashboard
+        </a>
+
+        <a href="./properties.html" class="sidebar-link">
+          Properties
+        </a>
+
+        <a href="./investments.html" class="sidebar-link">
+          Investments
+        </a>
+
+        <a href="./portfolio.html" class="sidebar-link">
+          Portfolio
+        </a>
+
+        <a href="./transactions.html" class="sidebar-link">
+          Transactions
+        </a>
+
+        <a href="./referrals.html" class="sidebar-link">
+          Referrals
+        </a>
+
+        <a href="./transfers.html" class="sidebar-link">
+          Transfers
+        </a>
+
+        <a href="./profile.html" class="sidebar-link active">
+          Profile
+        </a>
+
+        <button
+          id="logoutButton"
+          class="btn btn-danger btn-block"
+          type="button"
+        >
+          Logout
+        </button>
+
+      </nav>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+      <header class="app-header">
+
+        <div class="header-inner">
+
+          <button
+            id="mobileMenuButton"
+            class="mobile-menu-button"
+            type="button"
+            aria-label="Open navigation"
+          >
+            ☰
+          </button>
+
+          <div class="brand">
+            BuildVest
+          </div>
+
+          <div class="header-actions">
+            <span class="badge badge-success">
+              Active
+            </span>
+          </div>
+
+        </div>
+
+      </header>
+
+      <div class="page-content">
+
+        <div class="container">
+
+          <div class="page-header">
+
+            <div>
+              <h1 class="page-title">
+                Profile
+              </h1>
+
+              <p class="page-subtitle">
+                View your BuildVest account information.
+              </p>
+            </div>
+
+          </div>
+
+          <section class="card">
+
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">
+                  Account Information
+                </h2>
+
+                <p class="text-muted mt-2">
+                  Your current BuildVest account details.
+                </p>
+              </div>
+            </div>
+
+            <div class="card-body">
+
+              <div id="profileContainer">
+
+                <div class="loading">
+                  Loading profile...
+                </div>
+
+              </div>
+
+            </div>
+
+          </section>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="./js/main.js"></script>
+
+  <script>
+    async function loadProfilePage() {
+
+      const token =
+        localStorage.getItem("buildvest_token");
+
+      const container =
+        document.getElementById(
+          "profileContainer"
+        );
+
+      if (!token) {
+        window.location.href = "./index.html";
+        return;
+      }
+
+      try {
+
+        const response = await fetch(
+          "/api/admin/users/me",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+            "Failed to load profile"
+          );
+        }
+
+        const user =
+          data.user;
+
+        const verificationClass =
+          user.buildvest_verification_status === "VERIFIED"
+            ? "badge-success"
+            : user.buildvest_verification_status === "REJECTED"
+              ? "badge-danger"
+              : "badge-warning";
+
+        const accountClass =
+          user.buildvest_account_status === "ACTIVE"
+            ? "badge-success"
+            : "badge-danger";
+
+        container.innerHTML = `
+
+          <div class="grid grid-2">
+
+            <div class="card">
+
+              <div class="card-body">
+
+                <div class="stat-label">
+                  Full Name
+                </div>
+
+                <div class="section-title mt-2">
+                  ${user.full_name || "—"}
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="card">
+
+              <div class="card-body">
+
+                <div class="stat-label">
+                  Email
+                </div>
+
+                <div class="section-title mt-2">
+                  ${user.email || "—"}
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="card">
+
+              <div class="card-body">
+
+                <div class="stat-label">
+                  Phone
+                </div>
+
+                <div class="section-title mt-2">
+                  ${user.phone || "Not provided"}
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="card">
+
+              <div class="card-body">
+
+                <div class="stat-label">
+                  Role
+                </div>
+
+                <div class="section-title mt-2">
+                  ${user.role || "—"}
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="card">
+
+              <div class="card-body">
+
+                <div class="stat-label">
+                  Account Status
+                </div>
+
+                <div class="mt-2">
+                  <span class="badge ${accountClass}">
+                    ${user.buildvest_account_status}
+                  </span>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="card">
+
+              <div class="card-body">
+
+                <div class="stat-label">
+                  Verification Status
+                </div>
+
+                <div class="mt-2">
+                  <span class="badge ${verificationClass}">
+                    ${user.buildvest_verification_status}
+                  </span>
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="card">
+
+              <div class="card-body">
+
+                <div class="stat-label">
+                  Verified
+                </div>
+
+                <div class="section-title mt-2">
+                  ${user.is_verified ? "Yes" : "No"}
+                </div>
+
+              </div>
+
+            </div>
+
+            <div class="card">
+
+              <div class="card-body">
+
+                <div class="stat-label">
+                  Joined BuildVest
+                </div>
+
+                <div class="section-title mt-2">
+                  ${
+                    user.buildvest_joined_at
+                      ? new Date(
+                          user.buildvest_joined_at
+                        ).toLocaleDateString("en-KE")
+                      : "—"
+                  }
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        `;
+
+      } catch (error) {
+
+        console.error(
+          "Load profile page error:",
+          error
+        );
+
+        container.innerHTML = `
+          <div class="error-state">
+            ${error.message}
+          </div>
+        `;
+      }
+
+    }
+
+    loadProfilePage();
+  </script>
+
+</body>
+</html>
