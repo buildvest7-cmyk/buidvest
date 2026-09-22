@@ -11,3 +11,28 @@ Thumbs.db
 
 .vscode/
 .idea/
+
+# Local BuildVest development/helper scripts
+/backend/add-buildvest-account-status.js
+/backend/add-buildvest-admin-profile.js
+/backend/add-buildvest-verification-status.js
+/backend/check-account-status-values.js
+/backend/check-account-status.js
+/backend/check-admin.js
+/backend/check-buildvest-profile-columns.js
+/backend/check-profile.js
+/backend/check-role.js
+/backend/create-buildvest-admin.js
+/backend/verify-buildvest-profile.js
+
+# Local inspection/schema utilities
+/backend/src/config/inspectAllTables.js
+/backend/src/config/inspectDatabase.js
+/backend/src/config/inspectUsers.js
+/backend/src/config/runSchema.js
+
+# Accidental duplicate frontend
+/backend/frontend/
+
+# Shared Coast Connect schema - never commit to BuildVest
+/database/schema.sql
