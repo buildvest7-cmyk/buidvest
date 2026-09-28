@@ -1511,7 +1511,7 @@ button[type="submit"]:hover {
 
 .mobile-login-brand {
   display: none;
-  margin-bottom: 50px;
+  margin-bottom: 0px;
   color: var(--primary);
   font-size: 28px;
   font-weight: 800;
@@ -1895,4 +1895,587 @@ button[type="submit"]:hover {
   .investment-card {
     box-shadow: none;
   }
+}
+/* =========================================================
+   PUBLIC BUILTVEST WEBSITE
+   ========================================================= */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+
+.site-header-inner {
+  max-width: var(--container);
+  margin: 0 auto;
+  min-height: 72px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.site-logo {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.site-nav a {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.site-nav a:hover {
+  color: var(--primary);
+}
+
+.site-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.site-hero {
+  padding: 88px 0 96px;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(37, 99, 235, 0.10),
+      transparent 34%
+    ),
+    var(--surface);
+}
+
+.site-hero-grid {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.site-hero-content {
+  max-width: 650px;
+}
+
+.site-hero-title {
+  margin: 18px 0 22px;
+  font-size: clamp(44px, 6vw, 72px);
+  line-height: 1.02;
+  letter-spacing: -2.5px;
+  color: var(--text);
+}
+
+.site-hero-text {
+  max-width: 600px;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.site-hero-actions {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.site-hero-trust {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.site-hero-visual {
+  display: flex;
+  justify-content: center;
+}
+
+.hero-dashboard-card {
+  width: 100%;
+  max-width: 500px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.hero-dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.hero-dashboard-header h3 {
+  margin: 4px 0 0;
+  font-size: 22px;
+}
+
+.hero-balance-card {
+  margin-top: 22px;
+  padding: 26px;
+  border-radius: var(--radius-lg);
+  background: var(--primary-light);
+  border: 1px solid rgba(37, 99, 235, 0.12);
+}
+
+.hero-balance-card strong {
+  display: block;
+  margin: 8px 0;
+  font-size: 30px;
+  color: var(--primary);
+}
+
+.hero-mini-grid {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.hero-mini-card {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-secondary);
+}
+
+.hero-mini-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 18px;
+}
+
+.hero-activity {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.hero-activity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 15px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.hero-activity-row strong,
+.hero-activity-row span {
+  display: block;
+}
+
+.hero-activity-row > div span {
+  margin-top: 3px;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.site-section {
+  padding: 88px 0;
+  background: var(--surface);
+}
+
+.site-section-soft {
+  background: var(--background);
+}
+
+.site-section-heading {
+  max-width: 720px;
+  margin: 0 auto 48px;
+  text-align: center;
+}
+
+.site-section-title {
+  margin: 14px 0 14px;
+  font-size: clamp(32px, 4vw, 48px);
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+}
+
+.site-section-text {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.site-feature-grid {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.site-feature-card {
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.site-feature-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.site-feature-card h3 {
+  margin: 22px 0 10px;
+  font-size: 20px;
+}
+
+.site-feature-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.site-opportunity-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+}
+
+.site-opportunity-card h3 {
+  margin: 14px 0 8px;
+  font-size: 28px;
+}
+
+.site-opportunity-card p {
+  max-width: 650px;
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.site-steps-grid {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.site-step {
+  padding: 28px;
+  border-top: 3px solid var(--primary);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.site-step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.site-step h3 {
+  margin: 16px 0 10px;
+  font-size: 19px;
+}
+
+.site-step p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+.site-about {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+.site-about-text {
+  margin: 0 0 24px;
+  color: var(--text-secondary);
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.site-cta {
+  padding: 24px 0 88px;
+  background: var(--background);
+}
+
+.site-cta-card {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.site-cta-card h2 {
+  margin: 12px 0 8px;
+  font-size: 34px;
+  letter-spacing: -1px;
+}
+
+.site-cta-card p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.site-footer {
+  padding: 56px 0 24px;
+  background: #ffffff;
+  border-top: 1px solid var(--border);
+}
+
+.site-footer-grid {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 24px 40px;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 40px;
+}
+
+.site-footer-grid p {
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.site-footer-grid h4 {
+  margin: 0 0 14px;
+  font-size: 14px;
+}
+
+.site-footer-grid a:not(.site-logo) {
+  display: block;
+  margin-top: 10px;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.site-footer-grid a:hover {
+  color: var(--primary);
+}
+
+.site-footer-bottom {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 20px 24px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   PUBLIC WEBSITE RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 980px) {
+
+  .site-header-inner {
+    gap: 16px;
+  }
+
+  .site-nav {
+    display: none;
+  }
+
+  .site-hero {
+    padding: 64px 0 72px;
+  }
+
+  .site-hero-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .site-hero-content {
+    max-width: none;
+  }
+
+  .site-feature-grid,
+  .site-steps-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .site-about {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+}
+
+@media (max-width: 640px) {
+
+  .site-header-inner {
+    min-height: 64px;
+    padding: 0 16px;
+  }
+
+  .site-header-actions .btn-secondary {
+    display: none;
+  }
+
+  .site-logo {
+    font-size: 21px;
+  }
+
+  .site-hero {
+    padding: 48px 0 56px;
+  }
+
+  .site-hero-grid {
+    padding: 0 16px;
+  }
+
+  .site-hero-title {
+    font-size: 43px;
+    letter-spacing: -1.8px;
+  }
+
+  .site-hero-text {
+    font-size: 16px;
+  }
+
+  .site-hero-actions {
+    flex-direction: column;
+  }
+
+  .site-hero-actions .btn {
+    width: 100%;
+  }
+
+  .site-hero-trust {
+    display: grid;
+    gap: 8px;
+  }
+
+  .hero-dashboard-card {
+    padding: 18px;
+  }
+
+  .hero-balance-card {
+    padding: 20px;
+  }
+
+  .site-section {
+    padding: 64px 0;
+  }
+
+  .site-feature-grid,
+  .site-steps-grid {
+    grid-template-columns: 1fr;
+    padding: 0 16px;
+  }
+
+  .site-feature-card,
+  .site-step {
+    padding: 24px;
+  }
+
+  .site-opportunity-card {
+    margin: 0 16px;
+    padding: 24px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .site-opportunity-card .btn {
+    width: 100%;
+  }
+
+  .site-about {
+    padding: 0 16px;
+  }
+
+  .site-cta {
+    padding-bottom: 64px;
+  }
+
+  .site-cta-card {
+    margin: 0 16px;
+    padding: 28px 22px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .site-cta-card h2 {
+    font-size: 28px;
+  }
+
+  .site-cta-card .btn {
+    width: 100%;
+  }
+
+  .site-footer-grid {
+    grid-template-columns: 1fr;
+    padding: 0 16px 32px;
+    gap: 28px;
+  }
+
+  .site-footer-bottom {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
 }

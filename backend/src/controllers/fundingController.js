@@ -225,7 +225,7 @@ async function approveFundingRequest(req, res) {
         reference
       )
       VALUES
-      ($1, $2, $3, $4, 'MANUAL_FUNDING', $5)
+      ($1, $2, $3, $4, 'MPESA_FUNDING', $5)
       `,
       [
         request.user_id,

@@ -134,21 +134,35 @@
 
             <div class="card-body">
 
-              <div class="card">
+                            <div class="card">
 
                 <div class="card-body">
 
                   <h3 class="card-title">
-                    Payment Instructions
+                    Direct M-PESA Payment
                   </h3>
 
                   <p class="text-muted mt-2">
-                    BuildVest payment details will be provided here.
+                    Send the amount you want to add to your BuildVest wallet
+                    directly via M-PESA.
                   </p>
 
-                  <p class="text-muted mt-2">
-                    After making your manual payment, submit the amount
-                    and payment reference below.
+                  <div class="stat-card mt-4">
+
+                    <div class="stat-label">
+                      M-PESA Number
+                    </div>
+
+                    <div class="stat-value">
+                      0712345678
+                    </div>
+
+                  </div>
+
+                  <p class="text-muted mt-4">
+                    After completing the M-PESA payment, enter the exact
+                    amount and your M-PESA transaction code below.
+                    Your payment will remain pending until it is verified.
                   </p>
 
                 </div>
@@ -177,15 +191,15 @@
 
                 <div class="form-group mt-4">
 
-                  <label for="paymentReference">
-                    Payment Reference
-                  </label>
+                 <label for="paymentReference">
+  M-PESA Transaction Code
+</label>
 
                   <input
                     id="paymentReference"
                     type="text"
                     class="form-control"
-                    placeholder="Enter your payment reference"
+                    placeholder="e.g. QK123ABC45"
                     required
                   >
 

@@ -260,6 +260,33 @@
                       ${investment.status}
                     </span>
 
+${
+  investment.status === "APPROVED" &&
+  !investment.payment_status
+    ? `
+      <button
+        type="button"
+        class="btn btn-primary btn-sm pay-investment-button mt-3"
+        data-investment-id="${investment.id}"
+      >
+        Pay Investment
+      </button>
+    `
+    : investment.payment_status === "SUCCESS"
+      ? `
+        <span class="badge badge-success mt-3">
+          Paid
+        </span>
+      `
+      : investment.payment_status === "PENDING"
+        ? `
+          <span class="badge badge-warning mt-3">
+            Payment Pending
+          </span>
+        `
+        : ""
+}
+
                   </div>
 
                 </div>
@@ -285,6 +312,65 @@
     }
 
     loadInvestmentsPage();
+    document.addEventListener(
+  "click",
+  async (event) => {
+    const button =
+      event.target.closest(
+        ".pay-investment-button"
+      );
+
+    if (!button) {
+      return;
+    }
+
+    const investmentId =
+      button.dataset.investmentId;
+
+    if (!investmentId) {
+      return;
+    }
+
+    const confirmed =
+      window.confirm(
+        "Pay for this investment using your BuildVest wallet?"
+      );
+
+    if (!confirmed) {
+      return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Processing...";
+
+    try {
+      const data =
+        await apiRequest(
+          "/transactions",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              investment_id: investmentId,
+            }),
+          }
+        );
+
+      window.alert(
+        data.message ||
+          "Investment payment completed successfully."
+      );
+
+      button.textContent = "Paid";
+
+    } catch (error) {
+      window.alert(error.message);
+
+      button.disabled = false;
+      button.textContent =
+        "Pay Investment";
+    }
+  }
+);
   </script>
 
 </body>

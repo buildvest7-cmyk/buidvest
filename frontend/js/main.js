@@ -932,6 +932,11 @@ async function loadPropertyDetails() {
             return;
           }
 
+          if (!getToken()) {
+  window.location.href = "./login.html";
+  return;
+}
+
           investButton.disabled = true;
           investButton.textContent =
             "Submitting...";
@@ -1206,9 +1211,8 @@ if (registerForm) {
 }
 
 if (
-  document.querySelector(
-    ".dashboard-layout"
-  )
+  document.querySelector(".dashboard-layout") &&
+  !document.getElementById("propertiesContainer")
 ) {
   initializeDashboard();
 }
@@ -1324,3 +1328,232 @@ if (
     );
   });
 }
+
+async function loadHomepageProperties() {
+
+  const container =
+    document.getElementById("homepageProperties");
+
+  if (!container) {
+    return;
+  }
+
+  try {
+
+    const response =
+      await fetch("/api/properties");
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.message ||
+        "Failed to load investment opportunities"
+      );
+    }
+
+    const properties =
+      data.properties || [];
+
+    if (properties.length === 0) {
+
+      container.innerHTML = `
+        <div class="empty-state">
+          No investment opportunities are currently available.
+        </div>
+      `;
+
+      return;
+    }
+
+    container.innerHTML =
+      properties
+        .slice(0, 3)
+        .map(
+          (property) => `
+            <div class="site-feature-card">
+
+              <span class="badge badge-success">
+                ${property.status}
+              </span>
+
+              <h3>
+                ${property.title}
+              </h3>
+
+              <p class="text-muted">
+                ${property.location}
+              </p>
+
+              <p>
+                ${
+                  property.description ||
+                  "Explore this BuildVest investment opportunity."
+                }
+              </p>
+
+              <div class="property-meta mt-5">
+
+                <div>
+                  <span>
+                    Unit Price
+                  </span>
+
+                  <strong>
+                    KES ${Number(
+                      property.unit_price
+                    ).toLocaleString("en-KE")}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>
+                    Available Units
+                  </span>
+
+                  <strong>
+                    ${property.available_units}
+                  </strong>
+                </div>
+
+              </div>
+
+              <a
+                href="./property.html?id=${property.id}"
+                class="btn btn-primary btn-block mt-5"
+              >
+                View Opportunity
+              </a>
+
+            </div>
+          `
+        )
+        .join("");
+
+  } catch (error) {
+
+    console.error(
+      "Homepage properties error:",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="error-state">
+        Investment opportunities could not be loaded.
+      </div>
+    `;
+
+  }
+}
+
+if (
+  document.getElementById(
+    "homepageProperties"
+  )
+) {
+  loadHomepageProperties();
+}
+
+
+async function loadPublicPropertiesPage() {
+  const container =
+    document.getElementById("propertiesContainer");
+
+  if (!container) {
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/properties");
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.message || "Failed to load properties"
+      );
+    }
+
+    if (!data.properties || data.properties.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          No investment properties are currently available.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = data.properties
+      .map(
+        (property) => `
+          <div class="property-card">
+            <div class="property-card-body">
+
+              <span class="badge badge-success">
+                ${property.status}
+              </span>
+
+              <h3 class="property-card-title">
+                ${property.title}
+              </h3>
+
+              <p class="text-muted">
+                ${property.location}
+              </p>
+
+              <p class="property-description">
+                ${property.description || ""}
+              </p>
+
+              <div class="property-meta">
+                <div>
+                  <span>Unit Price</span>
+                  <strong>
+                    KES ${Number(property.unit_price).toLocaleString()}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Available Units</span>
+                  <strong>
+                    ${property.available_units}
+                  </strong>
+                </div>
+              </div>
+
+              <a
+                href="./property.html?id=${property.id}"
+                class="btn btn-primary btn-block"
+              >
+                View Opportunity
+              </a>
+
+            </div>
+          </div>
+        `
+      )
+      .join("");
+
+  } catch (error) {
+    console.error(
+      "Public properties error:",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="error-state">
+        Investment properties could not be loaded.
+      </div>
+    `;
+  }
+}
+
+if (
+  document.getElementById("propertiesContainer")
+) {
+  loadPublicPropertiesPage();
+}
+

@@ -167,16 +167,25 @@ async function getMyInvestments(req, res) {
 
     const result = await pool.query(
       `
-      SELECT
-        i.id,
-        i.property_id,
-        p.title AS property_title,
-        p.location,
-        p.property_type,
-        i.amount,
-        i.units,
-        i.status,
-        i.created_at
+             SELECT
+          i.id,
+          i.property_id,
+          p.title AS property_title,
+          p.location,
+          p.property_type,
+          i.amount,
+          i.units,
+          i.status,
+          i.created_at,
+          (
+            SELECT t.status
+            FROM buildvest_transactions t
+            WHERE t.investment_id = i.id
+              AND t.user_id = $1
+              AND t.status IN ('PENDING', 'SUCCESS')
+            ORDER BY t.created_at DESC
+            LIMIT 1
+          ) AS payment_status
       FROM buildvest_investments i
       INNER JOIN buildvest_properties p
         ON p.id = i.property_id
